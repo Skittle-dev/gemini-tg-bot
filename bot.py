@@ -1,8 +1,21 @@
 import os
+import threading
 import telebot
 import requests
+from flask import Flask
 
-# Считываем секретные ключи из настроек Render (а не из текста кода!)
+# Создаем веб-сервер для бесплатного тарифа Render
+app = Flask(__name__)
+
+@app.route('/')
+def home():
+    return "Bot is alive!"
+
+def run_flask():
+    port = int(os.environ.get("PORT", 10000))
+    app.run(host='0.0.0.0', port=port)
+
+# Настройки бота
 TELEGRAM_TOKEN = os.getenv("TELEGRAM_TOKEN")
 GEMINI_KEY = os.getenv("GEMINI_KEY")
 
@@ -15,8 +28,7 @@ def ask_gemini(user_id, text):
 
     user_history[user_id].append({"role": "user", "parts": [{"text": text}]})
 
-    # Используем модель gemini-1.5-flash или последнюю доступную версию
-    url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={GEMINI_KEY}"
+    url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent?key={GEMINI_KEY}"
     headers = {"Content-Type": "application/json"}
     data = {"contents": user_history[user_id]}
 
@@ -52,4 +64,8 @@ def handle_message(message):
     else:
         bot.reply_to(message, answer)
 
-bot.infinity_polling()
+if __name__ == "__main__":
+    # Запускаем Flask в отдельном потоке
+    threading.Thread(target=run_flask).start()
+    # Запускаем бота
+    bot.infinity_polling()
