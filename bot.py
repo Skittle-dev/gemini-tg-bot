@@ -28,7 +28,7 @@ def ask_gemini(user_id, text):
 
     user_history[user_id].append({"role": "user", "parts": [{"text": text}]})
 
-    url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent?key={GEMINI_KEY}"
+    url = f"url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key={GEMINI_KEY}}"
     headers = {"Content-Type": "application/json"}
     data = {"contents": user_history[user_id]}
 
